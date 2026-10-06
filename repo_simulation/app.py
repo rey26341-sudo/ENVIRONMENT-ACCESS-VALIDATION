@@ -32,10 +32,9 @@ def get_status():
         "app": APP_NAME,
         "version": VERSION,
         "env": ENV,
-        "timestamp": datetime.datetime.now(datetime.UTC).isoformat(),
+        "timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat(),
         "status": "healthy",
     }
-
 
 def start():
     """Simulate application startup."""
