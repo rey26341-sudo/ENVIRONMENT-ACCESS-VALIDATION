@@ -6,9 +6,9 @@ Checks the health of the Laravel validation service
 from the Python validation environment.
 """
 
+import json
 import sys
 import urllib.request
-import json
 
 LARAVEL_HEALTH_URL = "http://127.0.0.1:8001/api/health"
 
@@ -31,7 +31,7 @@ def check_laravel_health():
 
         return True
 
-    except Exception as exc:
+    except (OSError, ValueError) as exc:
         print(f"Laravel health check failed: {exc}")
         return False
 
