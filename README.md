@@ -1,200 +1,517 @@
-# Environment Access Validation
+# Environment Access & Service Validation Platform
 
-![Python](https://img.shields.io/badge/Python-3.10+-blue?logo=python&logoColor=white)
-![Shell](https://img.shields.io/badge/Shell-Bash-green?logo=gnubash&logoColor=white)
-![AWS CloudShell](https://img.shields.io/badge/AWS-CloudShell-orange?logo=amazonaws&logoColor=white)
-![CI/CD](https://img.shields.io/badge/CI/CD-GitHub%20Actions-2088FF?logo=githubactions&logoColor=white)
-![Status](https://img.shields.io/badge/Checks-4%20Passing-brightgreen)
+A software validation project demonstrating **Python application validation, PHP/Laravel REST API development, automated testing, and CI/CD using GitHub Actions**.
 
-A DevOps practice project that simulates and automates the **pre-deployment environment validation** process using a real Linux environment on AWS CloudShell.
-
-<img width="1440" height="1440" alt="image" src="https://github.com/user-attachments/assets/caaa977d-31fc-4869-bb8d-8ba141622e39" />
-
-> Built and executed entirely in **AWS CloudShell (ap-south-1, Mumbai)** — a real cloud-hosted Linux terminal on Amazon's infrastructure.
+The project simulates an environment-access and application-validation workflow where a Python validation layer communicates with a Laravel service through a REST API and verifies the service health.
 
 ---
 
-## What Problem Does This Solve?
+## Project Overview
 
-In real DevOps work, before deploying any application, an engineer must verify:
+Modern software environments often contain multiple services built with different technologies.
 
-| Question | Type of Check |
-|---|---|
-| Can I access the server? | SSH / Shell check |
-| Is the code repository ready? | Repo structure check |
-| Is the pipeline running? | CI/CD pipeline check |
-| Can I monitor the application? | Log access check |
+This project demonstrates a simple cross-stack validation architecture:
 
-Doing this manually every time is slow and error-prone. This project **automates all 4 checks** and generates a timestamped report.
+```text
+┌─────────────────────────────┐
+│      Python Validator       │
+│                             │
+│  Environment validation     │
+│  Service health checking    │
+└──────────────┬──────────────┘
+               │
+               │ HTTP / JSON
+               ▼
+┌─────────────────────────────┐
+│      Laravel Service        │
+│                             │
+│      GET /api/health        │
+│                             │
+│  Returns service status     │
+└──────────────┬──────────────┘
+               │
+               ▼
+        JSON Health Response
+               │
+               ▼
+┌─────────────────────────────┐
+│    Automated Validation     │
+│                             │
+│  Python check + Laravel     │
+│  feature tests              │
+└─────────────────────────────┘
+```
+
+The project is designed as a portfolio demonstration of **backend development, API integration, software validation, and DevOps practices**.
 
 ---
 
-## Architecture
+## Key Features
 
-```
-Developer (Rey)
-      │
-      │ types commands in browser
-      ▼
-┌─────────────────────────────────────────────┐
-│         AWS CloudShell (ap-south-1)         │
-│   Real Linux environment on AWS servers     │
-│                                             │
-│  ┌──────────────┐   ┌──────────────────┐   │
-│  │   Check 1    │   │    Check 2       │   │
-│  │ SSH / Shell  │   │ Repo structure   │   │
-│  │ whoami       │   │ app.py           │   │
-│  │ uname -n     │   │ config.yml       │   │
-│  │ uptime       │   │                  │   │
-│  └──────────────┘   └──────────────────┘   │
-│  ┌──────────────┐   ┌──────────────────┐   │
-│  │   Check 3    │   │    Check 4       │   │
-│  │ Pipeline     │   │ Log directory    │   │
-│  │ build_status │   │ logs/app.log     │   │
-│  │ .txt         │   │                  │   │
-│  └──────────────┘   └──────────────────┘   │
-│              │                             │
-│              ▼                             │
-│   access_checklist_report.txt              │
-│   (auto-generated report)                  │
-└─────────────────────────────────────────────┘
-      │
-      │ git add → git commit → git push
-      │ (SSH key auth via ed25519)
-      ▼
-┌─────────────────────────────────────────────┐
-│              GitHub Repository              │
-│         rey26341-sudo/ENVIRONMENT-          │
-│           ACCESS-VALIDATION                 │
-│                                             │
-│  Files pushed:                              │
-│  ├── validate_environment.py                │
-│  ├── access_checklist_report.txt            │
-│  ├── logs/app.log                           │
-│  ├── pipeline_simulation/build_status.txt   │
-│  ├── repo_simulation/app.py                 │
-│  ├── repo_simulation/config.yml             │
-│  └── .github/workflows/validate.yml        │
-│              │                              │
-│              ▼                              │
-│       GitHub Actions CI/CD                  │
-│   Runs automatically on every push          │
-│   Lint → Validate → Archive report          │
-└─────────────────────────────────────────────┘
-```
+* Python-based application validation
+* PHP/Laravel REST API
+* Laravel health-check endpoint
+* Python-to-Laravel HTTP integration
+* JSON API communication
+* Laravel feature testing
+* Python code-quality analysis with Pylint
+* GitHub Actions CI/CD
+* Composer dependency management
+* Environment configuration
+* Application logging
+* Git-based development workflow
+
+---
+
+## Technology Stack
+
+| Area                  | Technology                       |
+| --------------------- | -------------------------------- |
+| Validation layer      | Python                           |
+| Backend service       | PHP / Laravel                    |
+| API                   | REST / JSON                      |
+| Testing               | Laravel PHPUnit/Pest test runner |
+| Code quality          | Pylint                           |
+| Dependency management | Composer                         |
+| Version control       | Git / GitHub                     |
+| CI/CD                 | GitHub Actions                   |
+| Operating environment | Linux / Ubuntu                   |
 
 ---
 
 ## Project Structure
 
-```
+```text
 ENVIRONMENT-ACCESS-VALIDATION/
 │
-├── validate_environment.py           ← Main Python validation script
-├── access_checklist_report.txt       ← Auto-generated report
-│
-├── repo_simulation/
-│   ├── app.py                        ← Simulated application
-│   └── config.yml                    ← App configuration
-│
-├── pipeline_simulation/
-│   └── build_status.txt              ← Simulated pipeline status
+├── .github/
+│   └── workflows/
+│       ├── pylint.yml
+│       └── php-laravel.yml
 │
 ├── logs/
-│   └── app.log                       ← Application log file
+│   └── app.log
 │
-├── .github/workflows/
-│   └── validate.yml                  ← GitHub Actions CI pipeline
+├── pipeline_simulation/
+│   ├── build_status.txt
+│   └── validate environment.txt
 │
-└── pipeline_flow_documentation_v1.md ← Full pipeline documentation
+├── repo_simulation/
+│   ├── app.py
+│   ├── config.yml
+│   └── laravel_health_check.py
+│
+├── php-service/
+│   ├── app/
+│   ├── routes/
+│   │   └── api.php
+│   ├── tests/
+│   │   └── Feature/
+│   │       └── HealthApiTest.php
+│   ├── composer.json
+│   └── ...
+│
+├── access_checklist_report.txt
+├── pipeline_flow_documentation_v1.md
+└── README.md
 ```
 
 ---
 
-## The 4 Checks
+# 1. Python Validation Layer
 
-| # | Check | Commands Used | Result |
-|---|---|---|---|
-| 1 | SSH / Shell Access | `whoami` `uname -n` `uptime` | ✅ SUCCESS |
-| 2 | Repository Structure | `ls -R` `ls -l` | ✅ SUCCESS |
-| 3 | Pipeline Status | `cat build_status.txt` | ✅ SUCCESS |
-| 4 | Log Directory Access | `cat app.log` | ✅ SUCCESS |
+The Python component simulates an environment/application validation service.
+
+The application provides:
+
+* application identification
+* version information
+* environment information
+* health status
+* timestamp generation
+* application logging
+
+Example health information:
+
+```json
+{
+    "app": "environment-access-validator",
+    "version": "1.0.0",
+    "env": "development",
+    "status": "healthy"
+}
+```
+
+The Python application is located at:
+
+```text
+repo_simulation/app.py
+```
 
 ---
 
-## How To Run
+# 2. Laravel REST Service
+
+The project includes a Laravel application located at:
+
+```text
+php-service/
+```
+
+A health-check API endpoint was implemented:
+
+```text
+GET /api/health
+```
+
+The endpoint returns JSON containing the Laravel application's:
+
+* application name
+* version
+* status
+* environment
+* timestamp
+
+Example response:
+
+```json
+{
+    "app": "php-validation-service",
+    "version": "1.0.0",
+    "status": "healthy",
+    "environment": "local",
+    "timestamp": "..."
+}
+```
+
+This provides a simple REST interface that can be consumed by another application.
+
+---
+
+# 3. Python → Laravel Integration
+
+The Python validation layer communicates with the Laravel service through HTTP.
+
+The integration component is:
+
+```text
+repo_simulation/laravel_health_check.py
+```
+
+It performs the following process:
+
+```text
+Python Validator
+      │
+      │ HTTP GET
+      ▼
+/api/health
+      │
+      │ JSON
+      ▼
+Laravel Service
+      │
+      ▼
+Python validates:
+      │
+      ├── status
+      ├── application name
+      ├── version
+      └── environment
+```
+
+If the Laravel service reports a healthy status, the Python validation process succeeds.
+
+If the service cannot be reached or returns an invalid response, the validation process fails.
+
+---
+
+# 4. Automated Testing
+
+The Laravel application contains a feature test:
+
+```text
+php-service/tests/Feature/HealthApiTest.php
+```
+
+The test verifies that:
+
+* `/api/health` responds successfully
+* the application name is correct
+* the version is correct
+* the service reports a healthy status
+
+Laravel tests can be executed with:
 
 ```bash
-# Clone the repo
+cd php-service
+php artisan test
+```
+
+---
+
+# 5. Python Code Quality
+
+Pylint is used to analyze the Python validation components.
+
+Run:
+
+```bash
+pylint repo_simulation/*.py
+```
+
+The current Python validation code passes local Pylint analysis with:
+
+```text
+10.00/10
+```
+
+---
+
+# 6. CI/CD with GitHub Actions
+
+The project uses GitHub Actions to automatically validate changes.
+
+Two workflows are configured.
+
+### Python Pylint Workflow
+
+```text
+.github/workflows/pylint.yml
+```
+
+This workflow:
+
+1. Checks out the repository
+2. Installs Python
+3. Installs Pylint
+4. Analyzes Python source files
+
+### Laravel Validation Workflow
+
+```text
+.github/workflows/php-laravel.yml
+```
+
+This workflow:
+
+1. Checks out the repository
+2. Installs PHP
+3. Installs Composer dependencies
+4. Creates the Laravel environment
+5. Generates the application key
+6. Runs Laravel tests
+
+This means code changes can be automatically validated before being considered ready.
+
+---
+
+# 7. Local Setup
+
+## Clone the repository
+
+```bash
 git clone https://github.com/rey26341-sudo/ENVIRONMENT-ACCESS-VALIDATION.git
 cd ENVIRONMENT-ACCESS-VALIDATION
-
-# Run the validation script
-python validate_environment.py
-```
-
-### Output
-
-```
-==================================================
-  ENVIRONMENT ACCESS VALIDATION
-  2026-03-03 09:50:39
-==================================================
-
-CHECK 1: SSH / Shell Environment
-  whoami   → cloudshell-user
-  hostname → (not found — used uname -n)
-  uname -n → ip-10-131-17-245.ap-south-1.compute.internal
-  uptime   → 09:50:39 up 25 min, 0 users, load average: 0.02
-  [✔] SSH / Shell Access: SUCCESS
-
-CHECK 2: Repository Structure
-  ✔ Found: repo_simulation/app.py
-  ✔ Found: repo_simulation/config.yml
-  [✔] Repository Structure: SUCCESS
-
-CHECK 3: Pipeline Simulation
-  ✔ pipeline: SUCCESS
-  ✔ build #101 completed
-  [✔] Pipeline Simulation: SUCCESS
-
-CHECK 4: Log Directory Access
-  ✔ application started successfully
-  ✔ no errors detected
-  [✔] Log Directory Access: SUCCESS
-
-  Report written → access_checklist_report.txt
-==================================================
-  OVERALL: ALL CHECKS PASSED ✔
-==================================================
 ```
 
 ---
 
-## Real Issues Faced & How I Solved Them
+## Run the Python application
 
-These are actual errors hit while building this in AWS CloudShell:
-
-| Issue | Error Message | Resolution |
-|---|---|---|
-| `hostname` not available | `bash: hostname: command not found` | Used `uname -n` as fallback |
-| Git had no identity set | `fatal: empty ident name not allowed` | Ran `git config --global user.email` and `user.name` |
-| SSH key permission too open | `WARNING: UNPROTECTED PRIVATE KEY FILE!` | Used correct private key file path |
-| Space in folder name | `bash: cd: too many arguments` | Used underscore: `repo_simulation` |
-
----
-
-## CI/CD Pipeline
-
-GitHub Actions workflow runs automatically on every push to `main`:
-
-```
-Push to main → Setup Python 3.10 → Lint (flake8)
-     → Run validate_environment.py
-     → Archive access_checklist_report.txt (30 days)
+```bash
+python3 repo_simulation/app.py
 ```
 
 ---
+
+## Install Laravel dependencies
+
+```bash
+cd php-service
+composer install
+```
+
+Create the environment file:
+
+```bash
+cp .env.example .env
+```
+
+Generate the Laravel application key:
+
+```bash
+php artisan key:generate
+```
+
+---
+
+## Start the Laravel server
+
+```bash
+php artisan serve --port=8001
+```
+
+The application will be available at:
+
+```text
+http://127.0.0.1:8001
+```
+
+---
+
+## Test the Laravel API
+
+Open another terminal and run:
+
+```bash
+curl http://127.0.0.1:8001/api/health
+```
+
+Expected result:
+
+```json
+{
+    "app": "php-validation-service",
+    "version": "1.0.0",
+    "status": "healthy",
+    "environment": "local"
+}
+```
+
+---
+
+## Run the Python → Laravel integration
+
+With Laravel running:
+
+```bash
+python3 repo_simulation/laravel_health_check.py
+```
+
+Expected output:
+
+```text
+Laravel service is healthy.
+App: php-validation-service
+Version: 1.0.0
+Environment: local
+```
+
+---
+
+# 8. Run Tests
+
+Laravel:
+
+```bash
+cd php-service
+php artisan test
+```
+
+Python:
+
+```bash
+cd ..
+pylint repo_simulation/*.py
+```
+
+---
+
+# 9. CI/CD Workflow
+
+The intended development workflow is:
+
+```text
+Developer
+    │
+    ▼
+Git branch
+    │
+    ▼
+Code changes
+    │
+    ▼
+Git commit
+    │
+    ▼
+GitHub
+    │
+    ├───────────────┐
+    ▼               ▼
+Python Pylint    Laravel Tests
+    │               │
+    ▼               ▼
+Code Quality     API Validation
+    │               │
+    └───────┬───────┘
+            ▼
+       CI Result
+```
+
+---
+
+# 10. Engineering Objective
+
+Although this project is primarily a software project, it demonstrates an important engineering practice:
+
+> **Validating the behavior of one system component from another system component through an automated interface.**
+
+The same principle is commonly used in larger distributed systems, industrial monitoring applications, automation platforms, robotics systems, and IoT environments.
+
+The project therefore provides a foundation for extending the validation architecture toward:
+
+* service monitoring
+* IoT device validation
+* hardware telemetry
+* robotics systems
+* equipment monitoring
+* automated diagnostics
+* cloud-based validation services
+
+---
+
+# 11. Future Improvements
+
+Planned improvements include:
+
+* Automated Laravel server startup inside CI
+* Python → Laravel integration testing inside GitHub Actions
+* API request/response validation
+* Configuration-driven validation checks
+* Structured logging
+* Docker containerization
+* API authentication
+* Database-backed validation records
+* Monitoring dashboard
+* Health and readiness endpoints
+* Automated deployment pipeline
+
+---
+
+## Portfolio Summary
+
+This project demonstrates practical experience across multiple layers of modern software development:
+
+```text
+Python
+  +
+PHP / Laravel
+  +
+REST APIs
+  +
+Automated Testing
+  +
+Git
+  +
+GitHub Actions
+  +
+CI/CD
+```
+
+The project focuses on building and validating a small multi-language service architecture rather than demonstrating a single isolated programming language.
+
+
 
 ## What I Actually Did — Step by Step
 
@@ -256,7 +573,7 @@ Push to main → Setup Python 3.10 → Lint (flake8)
 - **SSH (ed25519)** — secure key authentication to GitHub
 - **nano** — terminal text editor
 
----
+--
 
 ## Project Status
 
@@ -269,4 +586,4 @@ Executed in a real cloud environment (AWS CloudShell) but does not connect to a 
 
 **Rey** — Aspiring DevOps Engineer
 Self-taught | DevOps Course Certified | Hands-on Practice
-[GitHub Profile](https://github.com/rey26341-sudo)
+[GitHub Profile](https://
